@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="Goods">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="bootstrap.min.css">
+        <title></title>
+        <style>
+            .cart{width:50px;height: 50px;position: fixed;bottom:30px;right: 50px;}
+            .cart img{width:100%;}
+            .cart .cartnum{position: absolute;top: -5px;right:-5px;padding:2px 4px;border-radius: 50%;background: red;color:aliceblue;}
+            .total{position: fixed;bottom:50px;left:50px;}
+            
+            .cartlist{position: fixed;top:0;left: 0;right: 0;bottom: 0;background: #000;padding:30px 20px 0;}
+            .cartlist p{color:aliceblue;font-weight: bold}
+        </style>
+    </head>
+    <body>
+        <div ng-controller="goodsController">
+            <div ng-repeat="item in goods">
+                <b>{{item.name}}</b>---价格：<span>{{item.price|currency}}</span>
+                --- <button ng-click="buy($index)">购买</button>
+            </div>
+            
+            <!-- 购物车里面的列表 -->
+            <div class="cartlist" ng-show="cartShow">
+                <p ng-repeat="item2 in cart">{{item2.name}}---{{goodsnum[item2.goodsid]}}</p>
+            </div>
+            
+            <!-- 总计 -->
+            <div class="total"><h2>总计:{{total|currency}}</h2></div>
+            <!-- 购物车数量 -->
+            <div class="cart" ng-click="toggleCart()">
+                <img src="cart.jpg" alt="">
+                <div class="cartnum">{{cartnum}}</div>
+            </div>
+        </div>
+        <script src="angular.js"></script>
+        <script>
+            var goodsList = [
+                {"name":"乐百氏","price":1.5,"goodsid":11},
+                {"name":"高乐高","price":30,"goodsid":12},
+                {"name":"养乐多","price":2.3,"goodsid":23},
+                {"name":"如梦","price":18.8,"goodsid":34},
+                {"name":"美汁源","price":8.5,"goodsid":35},
+                {"name":"巧克力","price":9.5,"goodsid":36},
+                {"name":"农夫山泉","price":2.5,"goodsid":37},
+                {"name":"脉动","price":4.5,"goodsid":38},
+                {"name":"乐事","price":7.5,"goodsid":41},
+                {"name":"美年达","price":2.5,"goodsid":15},
+                {"name":"雀巢","price":5.5,"goodsid":51},
+                {"name":"老干妈","price":12.5,"goodsid":52},
+                {"name":"老干妈奶牛冰棍","price":2.5,"goodsid":52},
+            ];
+            var goodsMoudle = angular.module('Goods',[]);
+            goodsMoudle.controller('goodsController',function($scope){
+                $scope.goods = goodsList;
+                $scope.cartShow = false;
+                //购物车
+                $scope.cart = {};
+                //购物车里边的商品数量
+                $scope.goodsnum = {};
+                
+                $scope.toggleCart = function(){
+                    $scope.cartShow = !$scope.cartShow;
+                }
+                $scope.buy = function(n){
+                    //alert('点击购买'+n)
+                   // $scope.cart.push(goodsList[n]);
+                    //console.log(goodsList[n]['goodsid']);
+                    var gid = goodsList[n]['goodsid'];
+                    if($scope.cart[gid] == null){
+                        $scope.cart[gid] = goodsList[n];
+                        $scope.goodsnum[gid] = 1;
+                    }else{
+                        $scope.goodsnum[gid] += 1;
+                    }
+                };
+                
+                //$watch方法 监测 数组或者对象是否有变化  需要加第三个参数 true 深度监控
+                $scope.$watch('goodsnum',function(){
+                    var total = 0;
+                    var cartnum = 0;
+                    for(var i in $scope.goodsnum){
+//                        console.log(i)
+//                        console.log($scope.goodsnum[i])
+//                        console.log($scope.cart[i])
+                        cartnum++;
+                        total += $scope.goodsnum[i] * $scope.cart[i]['price'];
+                    }
+                    
+                   $scope.total = total;
+                    $scope.cartnum = cartnum;
+                },true)
+                
+                
+            })
+
+        </script>
+    </body>
+</html>
